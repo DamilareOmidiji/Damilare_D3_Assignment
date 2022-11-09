@@ -1,0 +1,143 @@
+<!DOCTYPE html >
+<html>
+<head>
+    <meta charset="utf-8">
+    <script type ="text/javascript" src="d3.v4.js"></script>
+    <style>
+        body {
+            background: whitesmoke;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+
+.country{
+    fill:079350;
+    stroke: #160064;
+        stroke-width: 0.5;
+
+}
+        .towns{
+            /* fill: rgba(255, 255, 255, 0.7);
+        stroke: rgb(103, 103, 103); */
+        stroke-width: 1px;
+background-repeat: no-repeat;
+width: 15px;
+/* height: 10px; */
+        }
+
+
+.town{
+    fill: red;
+    font-size: 9px;
+}
+
+    </style>
+</head>
+
+<body>
+<div id="map">
+
+
+</div>
+<script>
+ var margin = {top: 0, left:0,right:0,bottom:0},
+ height = 1100,
+ width = 1100;
+
+ 
+ var svg = d3.select("#map")
+ .append("svg")
+ .attr("height", height)
+ .attr("width", width)
+ .append("g")
+ .attr("id","svg_id");
+
+
+ var projection = d3.geoNaturalEarth1()
+.translate([width/2, height/2])
+ .scale(5000)
+ .center([-6, 55])
+
+
+var path = d3.geoPath().projection(projection);
+d3.json('https://yamu.pro/gb.json', function(error, data) {
+console.log(data);
+
+
+svg.selectAll(".country")
+.data(data.features)
+.enter().append("path")
+.attr("class","country")
+.attr("d",path)
+.append('title')
+.text("United Kingdom");
+ });
+
+
+
+ d3.json('http://34.78.46.186/Circles/Towns/100', function(error, data) {
+console.log(data);
+svg.selectAll('.towns')
+.data(data)
+.enter().append('svg:image')
+.attr("class","towns")  .attr("transform", function (d) {
+          return "translate(" + -20 / 2 + "," + -20 / 2 + ")";
+        }) .attr("xlink:href", function (d) {
+          return 'map.png';
+        })
+
+
+// .attr("r", function(f){ 
+//     var pop = f.Population/20000
+//     console.log(pop);
+//     return 10;
+// })
+
+
+.attr("x",function(d){
+    console.log(d);
+    var coordinates = projection([d.lng, d.lat])
+    return coordinates[0];
+})
+
+
+.attr("y",function(d){
+    var coordinates = projection([d.lng, d.lat])
+    return coordinates[1]
+})
+
+svg.selectAll('town')
+.data(data)
+.enter()
+.append('text')
+.attr('class','town')
+.attr("x",function(d){
+    console.log(d);
+    var coordinates = projection([d.lng, d.lat, d.Town])
+    return coordinates[0];
+})
+
+
+.attr("y",function(d){
+    var coordinates = projection([d.lng, d.lat,d.Town])
+    return coordinates[1]
+
+
+}).text(function(d){
+    var coordinates = projection([d.lng, d.lat,d.Town])
+    console.log(d.Town);
+    return d.Town;
+})
+
+
+.attr('dx','20')
+.attr('dy','15')
+
+ });
+
+</script>
+
+</body>
+</html>
